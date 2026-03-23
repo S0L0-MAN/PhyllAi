@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'dashboard.dart'; // 1. YOU MUST ADD THIS IMPORT
 
 class WelcomePage extends StatefulWidget {
   const WelcomePage({super.key});
@@ -11,7 +12,7 @@ class WelcomePage extends StatefulWidget {
 class _WelcomePageState extends State<WelcomePage> with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _scaleAnimation;
-  bool _isPressed = false; // Track if the button is currently being clicked
+  bool _isPressed = false;
 
   @override
   void initState() {
@@ -30,20 +31,20 @@ class _WelcomePageState extends State<WelcomePage> with SingleTickerProviderStat
   }
 
   void _handleTap() async {
-    setState(() => _isPressed = true); // Change style to Outline
+    setState(() => _isPressed = true);
     _controller.forward();
     
     await Future.delayed(const Duration(milliseconds: 200));
     
     _controller.reverse();
-    setState(() => _isPressed = false); // Reset style
+    setState(() => _isPressed = false);
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text("Transitioning to Dashboard...")),
+    // 2. NAVIGATE TO DASHBOARD
+    // ignore: use_build_context_synchronously
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const DashboardPage()),
     );
-
-    // Navigation logic will go here:
-    // Navigator.push(context, MaterialPageRoute(builder: (context) => const DashboardPage()));
   }
 
   @override
@@ -81,7 +82,6 @@ class _WelcomePageState extends State<WelcomePage> with SingleTickerProviderStat
               ),
               const SizedBox(height: 120),
 
-              // THE DYNAMIC BUTTON
               ScaleTransition(
                 scale: _scaleAnimation,
                 child: SizedBox(
@@ -90,7 +90,6 @@ class _WelcomePageState extends State<WelcomePage> with SingleTickerProviderStat
                   child: OutlinedButton(
                     onPressed: _handleTap,
                     style: OutlinedButton.styleFrom(
-                      // Logic: If pressed, background is clear. If not, background is white.
                       backgroundColor: _isPressed ? Colors.transparent : Colors.white,
                       foregroundColor: _isPressed ? Colors.white : primaryColor,
                       side: const BorderSide(color: Colors.white, width: 2),
@@ -120,7 +119,7 @@ class _WelcomePageState extends State<WelcomePage> with SingleTickerProviderStat
                 children: [
                   CircleAvatar(radius: 4, backgroundColor: Colors.lightGreenAccent),
                   SizedBox(width: 10),
-                  Text(
+                  const Text(
                     "DINOv3 ENGINE READY",
                     style: TextStyle(color: Colors.white54, fontSize: 10, fontWeight: FontWeight.bold),
                   ),
