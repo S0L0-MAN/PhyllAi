@@ -119,7 +119,7 @@ class _WelcomePageState extends State<WelcomePage> with SingleTickerProviderStat
                 children: [
                   CircleAvatar(radius: 4, backgroundColor: Colors.lightGreenAccent),
                   SizedBox(width: 10),
-                  const Text(
+                  Text(
                     "DINOv3 ENGINE READY",
                     style: TextStyle(color: Colors.white54, fontSize: 10, fontWeight: FontWeight.bold),
                   ),

@@ -1,17 +1,8 @@
-# Core AI and GPU Acceleration (CUDA 12.1 specific)
---find-links https://download.pytorch.org/whl/cu121
-torch==2.1.0+cu121
-torchvision==0.16.0+cu121
-
-# XAI & Interpretability
+# General AI & XAI
 pytorch-grad-cam
 captum
-
-# Image Processing & Math
 opencv-python
 numpy
 Pillow
 matplotlib
-
-# General Utilities
 pathlib

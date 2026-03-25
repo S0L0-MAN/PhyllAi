@@ -10,25 +10,38 @@ from pytorch_grad_cam import GradCAM
 from pytorch_grad_cam.utils.model_targets import ClassifierOutputTarget
 from pytorch_grad_cam.utils.image import show_cam_on_image
 
+# Force UTF-8 encoding for Windows terminals to prevent encoding crashes
+if sys.platform == "win32":
+    sys.stdout.reconfigure(encoding='utf-8')
+
 # -------------------------------
 # Setup & Model Loading
 # -------------------------------
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
-MODEL_PATH = r"C:\Users\mails\Desktop\CropDiseaseDetection\best_mobilenet_apple_background_randomized.pth"
+
+# Using a relative path based on the script location for better portability
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+MODEL_PATH = os.path.join(SCRIPT_DIR, "models", "best_mobilenet_apple_background_randomized.pth")
+
 CLASS_NAMES = ['Apple Scab', 'Black Rot', 'Cedar Rust', 'Healthy']
 
 def load_phyllai_model():
     num_classes = 4
     model = models.mobilenet_v2(weights=None)
     model.classifier[1] = torch.nn.Linear(model.last_channel, num_classes)
-    model.load_state_dict(torch.load(MODEL_PATH, map_location=DEVICE))
+    
+    # weights_only=True silences the security warning and is best practice
+    model.load_state_dict(torch.load(MODEL_PATH, map_location=DEVICE, weights_only=True))
     model.to(DEVICE)
     model.eval()
     return model
 
-# Global model instance to avoid reloading every time (if running as a service)
-# For now, we load inside the function for the script call
-model = load_phyllai_model()
+# Load model globally
+try:
+    model = load_phyllai_model()
+except FileNotFoundError:
+    print(f"Error: Model file not found at {MODEL_PATH}")
+    sys.exit(1)
 
 # Image Transforms
 preprocess = transforms.Compose([
@@ -38,12 +51,13 @@ preprocess = transforms.Compose([
 ])
 
 def process_scan(scan_id):
+    # Update base_dir if your scans folder is in a different parent directory
     base_dir = r'C:\Users\mails\Desktop\PhyllAI\phyllai\scans'
     folder_path = os.path.join(base_dir, scan_id)
     input_path = os.path.join(folder_path, "input.jpg")
 
     if not os.path.exists(input_path):
-        print(f"❌ Error: {input_path} not found")
+        print(f"Error: {input_path} not found")
         return
 
     # 1. Load and Preprocess
@@ -74,7 +88,7 @@ def process_scan(scan_id):
     # Convert RGB to BGR for OpenCV saving
     cv2.imwrite(os.path.join(folder_path, "grad_cam.png"), cv2.cvtColor(grad_cam_result, cv2.COLOR_RGB2BGR))
     
-    # We'll save the raw heatmap as well for your Integrated Gradients slot
+    # Save the raw heatmap colored for the second UI slot
     heatmap_colored = cv2.applyColorMap((grayscale_cam * 255).astype(np.uint8), cv2.COLORMAP_JET)
     cv2.imwrite(os.path.join(folder_path, "heatmap.png"), heatmap_colored)
 
@@ -90,7 +104,8 @@ def process_scan(scan_id):
     with open(os.path.join(folder_path, "report.json"), "w") as f:
         json.dump(report_data, f, indent=4)
 
-    print(f"✅ AI Processed: {disease_name} ({confidence_score:.2%})")
+    print(f"AI Processed: {disease_name} ({confidence_score:.2%})")
+    sys.stdout.flush()
 
 if __name__ == "__main__":
     if len(sys.argv) > 1 and sys.argv[1] == "--hello":
