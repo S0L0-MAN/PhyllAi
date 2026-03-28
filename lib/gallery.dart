@@ -80,10 +80,10 @@ class _GalleryPageState extends State<GalleryPage> {
 
       debugPrint("Workspace created at: $folderPath");
 
-      // Optional: Open the folder automatically in Windows Explorer
-      if (Platform.isWindows) {
-        await Process.run('explorer.exe', [folderPath]);
-      }
+      // // Optional: Open the folder automatically in Windows Explorer
+      // if (Platform.isWindows) {
+      //   await Process.run('explorer.exe', [folderPath]);
+      // }
 
       if (mounted) {
         setState(() => _isAnalyzing = false);

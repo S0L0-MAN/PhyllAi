@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:phyllai/history.dart';
+import 'package:phyllai/camera.dart';
+import 'package:provider/provider.dart';
+import 'package:path/path.dart' as p;
+import 'history.dart';
 import 'gallery.dart'; 
+import 'model_manager.dart'; // Import the new manager
+import 'model_provider.dart'; // Import the provider
 
 class DashboardPage extends StatelessWidget {
   const DashboardPage({super.key});
@@ -9,6 +14,12 @@ class DashboardPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     const Color primaryColor = Color(0xFF0D986A);
+    
+    // Listen to the provider to get the current active model name
+    final modelProvider = Provider.of<ModelProvider>(context);
+    final String activeModelName = p.basename(modelProvider.selectedModel)
+        .replaceAll('.onnx', '')
+        .toUpperCase();
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -55,18 +66,34 @@ class DashboardPage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              "DASHBOARD CONTROLS",
-              style: TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.bold,
-                color: Colors.black45,
-                letterSpacing: 1.5,
-              ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text(
+                  "DASHBOARD CONTROLS",
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black45,
+                    letterSpacing: 1.5,
+                  ),
+                ),
+                // Small indicator for the active model
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: primaryColor.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(5),
+                  ),
+                  child: Text(
+                    activeModelName,
+                    style: const TextStyle(color: primaryColor, fontSize: 9, fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ],
             ),
             const SizedBox(height: 20),
             
-            // Unified Gallery Access
             _dashboardCard(
               context, 
               "Open Gallery", 
@@ -76,8 +103,8 @@ class DashboardPage extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    // Passing "DINOv3" as the default template name for now
-                    builder: (context) => const GalleryPage(activeModel: "DINOv3"),
+                    // Now passing the actual active model name dynamically
+                    builder: (context) => GalleryPage(activeModel: activeModelName),
                   ),
                 );
               },
@@ -88,10 +115,9 @@ class DashboardPage extends StatelessWidget {
               "Camera Scan", 
               Icons.camera_alt_outlined, 
               Colors.blueGrey,
-              onTap: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text("Camera module coming soon...")),
-                );
+              onTap: ()  {
+                Navigator.push(context,
+                MaterialPageRoute(builder: (context)=> const CameraPage()));
               },
             ),
 
@@ -112,8 +138,10 @@ class DashboardPage extends StatelessWidget {
               Icons.cloud_download_outlined, 
               Colors.deepPurple,
               onTap: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text("Model downloading system...")),
+                // Navigate to the real Model Manager Page
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const ModelManagerPage()),
                 );
               },
             ),

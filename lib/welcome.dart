@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'dashboard.dart'; // 1. YOU MUST ADD THIS IMPORT
+import 'package:provider/provider.dart'; // 1. Added Provider
+import 'package:path/path.dart' as p;    // 2. Added Path for filename parsing
+import 'dashboard.dart';
+import 'model_provider.dart';           // 3. Added ModelProvider import
 
 class WelcomePage extends StatefulWidget {
   const WelcomePage({super.key});
@@ -39,17 +42,25 @@ class _WelcomePageState extends State<WelcomePage> with SingleTickerProviderStat
     _controller.reverse();
     setState(() => _isPressed = false);
 
-    // 2. NAVIGATE TO DASHBOARD
-    // ignore: use_build_context_synchronously
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => const DashboardPage()),
-    );
+    if (mounted) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const DashboardPage()),
+      );
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     const Color primaryColor = Color(0xFF0D986A);
+    
+    // 4. Listen to the ModelProvider
+    final modelProvider = Provider.of<ModelProvider>(context);
+    final String activeModelPath = modelProvider.selectedModel;
+    final String modelName = p.basename(activeModelPath)
+        .replaceAll('.onnx', '')
+        .replaceAll('_', ' ')
+        .toUpperCase();
 
     return Scaffold(
       backgroundColor: primaryColor,
@@ -114,14 +125,20 @@ class _WelcomePageState extends State<WelcomePage> with SingleTickerProviderStat
               
               const SizedBox(height: 80),
               
-              const Row(
+              // 5. DYNAMIC STATUS LABEL
+              Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  CircleAvatar(radius: 4, backgroundColor: Colors.lightGreenAccent),
-                  SizedBox(width: 10),
+                  const CircleAvatar(radius: 4, backgroundColor: Colors.lightGreenAccent),
+                  const SizedBox(width: 10),
                   Text(
-                    "DINOv3 ENGINE READY",
-                    style: TextStyle(color: Colors.white54, fontSize: 10, fontWeight: FontWeight.bold),
+                    "$modelName READY",
+                    style: const TextStyle(
+                      color: Colors.white54, 
+                      fontSize: 10, 
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 1.1
+                    ),
                   ),
                 ],
               ),
