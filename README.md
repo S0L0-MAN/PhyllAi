@@ -26,7 +26,7 @@ Frontiers in Plant Science 7 (2016): 1419.
 
 DOI: 10.3389/fpls.2016.01419
 
-###Note
+### Note
 Models were trained on a locally processed version of the PlantVillage dataset with custom preprocessing, augmentation(Background Randomizarion), and train/validation/test splits.
 
 ### Normal input pipeline
