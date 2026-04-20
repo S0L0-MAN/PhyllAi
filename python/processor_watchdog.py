@@ -51,8 +51,11 @@ preprocess = transforms.Compose([
 ])
 
 def process_scan(scan_id):
-    # Update base_dir if your scans folder is in a different parent directory
-    base_dir = r'C:\Users\mails\Desktop\PhyllAI\phyllai\scans'
+    # Determine base directory dynamically (Project Root/scans)
+    # Assumes the script is in [Root]/python/
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    base_dir = os.path.join(os.path.dirname(script_dir), 'scans')
+    
     folder_path = os.path.join(base_dir, scan_id)
     input_path = os.path.join(folder_path, "input.jpg")
 

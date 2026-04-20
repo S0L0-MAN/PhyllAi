@@ -2,9 +2,9 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:path_provider/path_provider.dart'; 
 import 'package:path/path.dart' as p;            
 import 'processing.dart';                       
+import 'scan_storage.dart';
 
 class GalleryPage extends StatefulWidget {
   final String activeModel;
@@ -56,39 +56,16 @@ class _GalleryPageState extends State<GalleryPage> {
     setState(() => _isAnalyzing = true);
 
     try {
-      String folderPath;
-      
-      if (Platform.isWindows) {
-        // 1. Direct path to your Desktop Project folder
-        String projectPath = r'C:\Users\mails\Desktop\PhyllAI\phyllai';
-        String timestamp = DateTime.now().millisecondsSinceEpoch.toString();
-        folderPath = p.join(projectPath, 'scans', 'scan_$timestamp');
-      } else {
-        // Fallback for Mobile/Emulator testing
-        final directory = await getApplicationDocumentsDirectory();
-        String timestamp = DateTime.now().millisecondsSinceEpoch.toString();
-        folderPath = p.join(directory.path, 'scans', 'scan_$timestamp');
-      }
+      final folderPath = await createScanFolder();
 
-      // 2. Create the physical directory
-      final Directory scanFolder = Directory(folderPath);
-      await scanFolder.create(recursive: true);
-
-      // 3. Copy image to the new workspace
       final String filePath = p.join(folderPath, "input.jpg");
       await _selectedImage!.copy(filePath);
 
       debugPrint("Workspace created at: $folderPath");
 
-      // // Optional: Open the folder automatically in Windows Explorer
-      // if (Platform.isWindows) {
-      //   await Process.run('explorer.exe', [folderPath]);
-      // }
-
       if (mounted) {
         setState(() => _isAnalyzing = false);
 
-        // 4. Navigate to Processing Page
         Navigator.push(
           context,
           MaterialPageRoute(

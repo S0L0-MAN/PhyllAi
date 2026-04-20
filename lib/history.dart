@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:path/path.dart' as p;
 import 'diagnosis.dart';
+import 'scan_storage.dart';
 
 class HistoryPage extends StatefulWidget {
   const HistoryPage({super.key});
@@ -12,7 +13,6 @@ class HistoryPage extends StatefulWidget {
 }
 
 class _HistoryPageState extends State<HistoryPage> {
-  final String _scansPath = r'C:\Users\mails\Desktop\PhyllAI\phyllai\scans';
   List<FileSystemEntity> _scanFolders = [];
   bool _isLoading = true;
 
@@ -25,17 +25,15 @@ class _HistoryPageState extends State<HistoryPage> {
   Future<void> _loadHistory() async {
     setState(() => _isLoading = true);
     try {
-      final directory = Directory(_scansPath);
+      final scansPath = await getScansRootPath();
+      final directory = Directory(scansPath);
       if (await directory.exists()) {
-        // 1. Get all subdirectories in the scans folder
         List<FileSystemEntity> entities = await directory.list().toList();
-        
-        // 2. Filter to only include directories that start with 'scan_'
+
         _scanFolders = entities.whereType<Directory>().where((dir) {
           return p.basename(dir.path).startsWith('scan_');
         }).toList();
 
-        // 3. Sort by creation time (Newest first)
         _scanFolders.sort((a, b) {
           return b.statSync().changed.compareTo(a.statSync().changed);
         });
@@ -96,8 +94,6 @@ class _HistoryPageState extends State<HistoryPage> {
     final String folderPath = folder.path;
     final File inputFile = File(p.join(folderPath, "input.jpg"));
     final String folderName = p.basename(folderPath);
-    
-    // Formatting the date from the folder's timestamp or stat
     final DateTime date = folder.statSync().changed;
     final String formattedDate = "${date.day}/${date.month} - ${date.hour}:${date.minute}";
 
@@ -108,7 +104,7 @@ class _HistoryPageState extends State<HistoryPage> {
           MaterialPageRoute(
             builder: (context) => DiagnosisPage(
               scanFolderPath: folderPath,
-              modelUsed: "RETRIVED", // Or store the model name in a json file later
+              modelUsed: "RETRIEVED",
             ),
           ),
         );
@@ -121,7 +117,6 @@ class _HistoryPageState extends State<HistoryPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // 1. Image Thumbnail
             Expanded(
               child: ClipRRect(
                 borderRadius: const BorderRadius.vertical(top: Radius.circular(18)),
@@ -133,7 +128,6 @@ class _HistoryPageState extends State<HistoryPage> {
                       ),
               ),
             ),
-            // 2. Info Bar
             Padding(
               padding: const EdgeInsets.all(12),
               child: Column(

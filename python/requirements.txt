@@ -1,8 +1,16 @@
 # General AI & XAI
-pytorch-grad-cam
+torch
+torchvision
+grad-cam
 captum
 opencv-python
 numpy
 Pillow
 matplotlib
 pathlib
+ollama
+langchain-community
+langchain
+langchain-text-splitters
+sentence-transformers
+faiss-cpu

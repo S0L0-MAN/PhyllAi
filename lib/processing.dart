@@ -2,7 +2,9 @@ import 'dart:io';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:path/path.dart' as p;
+import 'package:shared_preferences/shared_preferences.dart';
 import 'diagnosis.dart';
+import 'python_runtime.dart';
 
 class ProcessingPage extends StatefulWidget {
   final String scanFolderPath;
@@ -24,19 +26,31 @@ class _ProcessingPageState extends State<ProcessingPage> {
   Future<void> _runAnalysis() async {
     try {
       if (Platform.isWindows) {
-        // 1. Path to your Virtual Environment Python
-        final pythonPath = r"C:\Users\mails\Desktop\PhyllAI\.venv\Scripts\python.exe";
-        final scriptPath = r"C:\Users\mails\Desktop\PhyllAI\phyllai\python\xai_engine.py";
+        final prefs = await SharedPreferences.getInstance();
+        final disableVlmRag = prefs.getBool('disable_vlm_rag') ?? false;
+        final ollamaModel = prefs.getString('ollama_model');
 
-        // 2. Run Python and pass the current scan folder path
-        final result = await Process.run(
-          pythonPath,
-          [scriptPath, widget.scanFolderPath],
-          runInShell: true,
+        final result = await PythonRuntime.runScript(
+          'xai_engine.py',
+          [widget.scanFolderPath],
+          environment: {
+            'PHYLLAI_DISABLE_VLM_RAG': disableVlmRag ? '1' : '0',
+            if (ollamaModel != null && ollamaModel.isNotEmpty)
+              'PHYLLAI_VLM_MODEL': ollamaModel,
+          },
         );
 
-        if (result.exitCode != 0 || !result.stdout.toString().contains("COMPLETED")) {
-          throw Exception("Python XAI Failed: ${result.stderr}");
+        if (result.exitCode != 0) {
+          String errorMsg = result.stderr.toString();
+          if (errorMsg.contains("ModuleNotFoundError")) {
+            errorMsg = "AI Engine Error: Missing Python dependencies.\n"
+                "Please run: pip install -r python/requirements.txt torch torchvision ollama langchain-community sentence-transformers faiss-cpu";
+          }
+          throw Exception("Python XAI Failed:\n$errorMsg");
+        }
+        
+        if (!result.stdout.toString().contains("COMPLETED")) {
+           throw Exception("Python XAI did not complete correctly.\nSTDOUT: ${result.stdout}");
         }
       } else {
         // Mobile fallback (Local Occlusion or simple report)
@@ -76,8 +90,8 @@ class _ProcessingPageState extends State<ProcessingPage> {
           children: [
             CircularProgressIndicator(color: Color(0xFF0D986A)),
             SizedBox(height: 25),
-            Text("RESEARCH-GRADE XAI ENGINE", style: TextStyle(fontWeight: FontWeight.bold)),
-            Text("Processing via Windows CUDA..."),
+            Text("MULTI-STAGE DIAGNOSTIC PIPELINE", style: TextStyle(fontWeight: FontWeight.bold)),
+            Text("Saving MobileNet + VLM + RAG artifacts..."),
           ],
         ),
       ),

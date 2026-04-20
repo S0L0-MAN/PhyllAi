@@ -5,8 +5,9 @@ import 'package:provider/provider.dart';
 import 'package:path/path.dart' as p;
 import 'history.dart';
 import 'gallery.dart'; 
-import 'model_manager.dart'; // Import the new manager
-import 'model_provider.dart'; // Import the provider
+import 'model_manager.dart'; 
+import 'model_provider.dart';
+import 'settings.dart';
 
 class DashboardPage extends StatelessWidget {
   const DashboardPage({super.key});
@@ -151,7 +152,12 @@ class DashboardPage extends StatelessWidget {
               "Settings", 
               Icons.settings_outlined, 
               Colors.grey,
-              onTap: () {},
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const SettingsPage()),
+                );
+              },
             ),
           ],
         ),

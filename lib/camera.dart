@@ -58,7 +58,7 @@ class _CameraPageState extends State<CameraPage> {
 
       // 3. Run on CPU
       final inputTensor = OrtValueTensor.createTensorWithDataList(inputBuffer, [1, 3, 224, 224]);
-      final outputs = await _session!.run(OrtRunOptions(), {'input': inputTensor});
+      final outputs = _session!.run(OrtRunOptions(), {'input': inputTensor});
 
       setState(() {
         _diagnosticResult = "CPU Analysis Complete: Disease Detected";
@@ -87,7 +87,22 @@ class _CameraPageState extends State<CameraPage> {
       if (photo == null) return;
 
       final Directory appDir = await getApplicationDocumentsDirectory();
-      final String savePath = p.join(appDir.path, 'scans', "scan_${DateTime.now().millisecondsSinceEpoch}.jpg");
+      String scansDirPath;
+      
+      if (Platform.isWindows) {
+        // Unify with GalleryPage: and use project root for Windows development
+        scansDirPath = p.join(Directory.current.path, 'scans');
+      } else {
+        scansDirPath = p.join(appDir.path, 'scans');
+      }
+
+      // Ensure directory exists
+      final Directory scansDir = Directory(scansDirPath);
+      if (!await scansDir.exists()) {
+        await scansDir.create(recursive: true);
+      }
+
+      final String savePath = p.join(scansDirPath, "scan_${DateTime.now().millisecondsSinceEpoch}.jpg");
       
       final File savedImage = await File(photo.path).copy(savePath);
 
