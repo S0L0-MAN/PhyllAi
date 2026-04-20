@@ -2,6 +2,8 @@
 *.class
 *.log
 *.pyc
+*.pyo
+*.pyd
 *.swp
 .DS_Store
 .atom/
@@ -11,6 +13,26 @@
 .svn/
 .swiftpm/
 migrate_working_dir/
+
+# Python caches / envs
+__pycache__/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+.env
+.env.*
+python/.venv/
+python/venv/
+python/.python-version
+python/models/
+python/**/*.pt
+python/**/*.pth
+python/**/*.onnx
+python/**/*.safetensors
+python/**/*.bin
+python/**/faiss_index_*/
 
 # IntelliJ related
 *.iml
@@ -27,6 +49,7 @@ migrate_working_dir/
 **/doc/api/
 **/ios/Flutter/.last_build_id
 .dart_tool/
+.flutter-plugins
 .flutter-plugins-dependencies
 .pub-cache/
 .pub/
@@ -43,6 +66,20 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Android (local-only files, signing keys)
+android/.gradle/
+android/local.properties
+android/key.properties
+**/*.jks
+**/*.keystore
+
+# iOS/macOS (CocoaPods + ephemeral)
+ios/Pods/
+ios/.symlinks/
+ios/Flutter/ephemeral/
+macos/Pods/
+macos/Flutter/ephemeral/
 
 #folders
 /scans
