@@ -14,7 +14,20 @@ PhyllAI helps you diagnose crop leaf diseases from a photo and explains why it r
 
 ---
 
+## Dataset
 
+This project uses the PlantVillage dataset for crop disease image classification experiments.
+
+Citation:
+
+Mohanty, Sharada P., David P. Hughes, and Marcel Salathé.  
+"Using deep learning for image-based plant disease detection."  
+Frontiers in Plant Science 7 (2016): 1419.
+
+DOI: 10.3389/fpls.2016.01419
+
+###Note
+Models were trained on a locally processed version of the PlantVillage dataset with custom preprocessing, augmentation(Background Randomizarion), and train/validation/test splits.
 
 ### Normal input pipeline
 
@@ -84,7 +97,14 @@ python server.py
 
 ---
 
+## Authors
+
+- **SOLO-MAN** (S0L0-MAN)
+- **Dhipin Subhash** (Dhipin1) 
+
+---
+
 ## License
 
-Add your license here (MIT/Apache-2.0/etc.).
+This project is licensed under the MIT License - see the LICENSE file for details.
 
