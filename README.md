@@ -14,9 +14,7 @@ PhyllAI helps you diagnose crop leaf diseases from a photo and explains why it r
 
 ---
 
-## How it works (conceptual)
 
-Drop your diagrams into `docs/images/` and keep these filenames (or update the links).
 
 ### Normal input pipeline
 
@@ -28,7 +26,7 @@ Drop your diagrams into `docs/images/` and keep these filenames (or update the l
 
 ---
 
-## The "VLM Sandwich" (what it means)
+## The VLM Sandwich
 
 PhyllAI uses a layered approach to go from pixels -> evidence -> words:
 
