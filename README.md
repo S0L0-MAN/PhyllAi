@@ -103,7 +103,7 @@ python server.py
 - **Dhipin Subhash** (Dhipin1) 
 
 ---
-
+Check out the medium article : https://medium.com/@absentarrow/phyllai-building-an-offline-ai-system-that-diagnoses-and-explains-crop-diseases-8773877da804
 ## License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
